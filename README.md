@@ -1,7 +1,7 @@
 # 总览
 
-结合 [viper](https://github.com/spf13/viper) 和 [cobra](https://github.com/spf13/cobra) 来构建命令行工具，通过一个struct绑定命令行参数，同时支持从`viper`中获取值
-tag的第一个标签为 flag的名字，如果没有指定tag，则使用字段名字作为flag的名字
+结合 [viper](https://github.com/spf13/viper) 和 [cobra](https://github.com/spf13/cobra) 来构建命令行工具，通过一个struct绑定命令行参数，同时支持从`viper`中获取值。
+tag的第一个标签为 flag的名字；如果没有指定，则使用字段名字作为flag的名字。 
 
 > FIELD  FIELD_TYPE `FLAG:"FLAG_NAME,LABEL,OTHER_LABEL:OTHER_VALUE"`
 * 标签:
@@ -20,10 +20,9 @@ tag的第一个标签为 flag的名字，如果没有指定tag，则使用字段
 
 # 为什么
 当前使用 `github.com/spf13` 来构建app以及绑定命令行参数已经很方便，`viper`可以指定参数来自于多个源，在使用时可以用 `viper:GetXXXX`来获取值。
-但是对于我来说还不足够方便,我希望
-1. 通过一个结构体，同过指定标签的方式来指定命令行参数，同时支持自动从`viper`中获取值；
-这样就可以在一个结构体中定义所有的参数并且直接使用，而且不用关心参数来自哪里。
-2. 可以避免将命令函的参数名字硬编码到代码的各个地方,比如 `viper.GetString("xxx")`，这样如果参数名字变了，就需要修改代码
+但是还不足够方便,我希望
+1. 通过一个结构体，用标签的方式来指定命令行参数，同时支持自动从`viper`中获取值； 绑定之后直接使用，不用关心参数的值来自哪里。
+2. 可以避免将命令参数名字硬编码到代码的各个地方,比如 `viper.GetString("xxx")`
 
 # 怎么做
 

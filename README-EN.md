@@ -2,7 +2,7 @@
 
 Combine [viper](https://github.com/spf13/viper) and [cobra](https://github.com/spf13/cobra) to build a command-line tool, binding command-line arguments to a struct and supporting value retrieval from `viper`.
 
-The first tag of the field represents the name of the flag. If no tag is specified, the field name is used as the flag name.
+The first tag of the field represents the name of the flag. If no flag name is specified, the field name is used as the flag name.
 
 >> FIELD  FIELD_TYPE `FLAG:FLAG_NAME,LABEL,OTHER_LABEL:OTHER_VALUE"`
 * Label:
@@ -21,8 +21,8 @@ The first tag of the field represents the name of the flag. If no tag is specifi
 # WHY
 Currently, using `github.com/spf13` to build apps and bind command-line arguments is already convenient. `viper` allows specifying parameters from multiple sources, and values can be retrieved using `viper.GetXXXX`. However, it is not convenient enough for me, and I would like to:
 1. Specify command-line parameters through a struct using tags and automatically retrieve values from `viper`.
-   This way, I can define all the parameters in one struct and directly use them without worrying about where the parameters come from.
-2. Avoid hardcoding the names of command function parameters throughout the code, such as `viper.GetString("xxx")`. If the parameter name changes, modifying the code would be necessary.
+   Use it directly after binding, no need to worry about where the parameter value comes from.
+2. You can avoid hard-coding command parameter names into various places in the code, such as `viper.GetString("xxx")`. 
 
 # HOW
 
