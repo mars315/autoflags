@@ -66,11 +66,11 @@ package autoflags
 
 import (
 	"fmt"
-	"github.com/mars315/autoflags/lib/stringx"
 	"reflect"
 	"strings"
 	"time"
 
+	"github.com/mars315/autoflags/lib/stringx"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
@@ -430,7 +430,6 @@ func parseTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 
 // getTag .
 func getTag(field reflect.StructField, cfg *FlagConfig) *tagData {
-
 	fulls, ok := field.Tag.Lookup(cfg.tagName)
 
 	// ignore untagged field

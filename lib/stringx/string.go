@@ -7,9 +7,10 @@
 package stringx
 
 import (
-	"github.com/mars315/autoflags/lib/builtin"
 	"strconv"
 	"strings"
+
+	"github.com/mars315/autoflags/lib/builtin"
 )
 
 func ToBool(s string) bool {

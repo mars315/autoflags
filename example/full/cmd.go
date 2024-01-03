@@ -37,9 +37,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/mars315/autoflags"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 func main() {

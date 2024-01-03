@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/mars315/autoflags"
 	"github.com/spf13/cobra"
 )
