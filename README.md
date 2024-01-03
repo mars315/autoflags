@@ -3,13 +3,13 @@
 结合 [viper](https://github.com/spf13/viper) 和 [cobra](https://github.com/spf13/cobra) 来构建命令行工具，通过一个struct绑定命令行参数，同时支持从`viper`中获取值
 tag的第一个标签为 flag的名字，如果没有指定tag，则使用字段名字作为flag的名字
 
->> FIELD  FIELD_TYPE `FLAG:FLAG_NAME,LABEL,OTHER_LABEL:OTHER_VALUE"`
-* Label:
- - short: short flag name
- - desc: description
- - default: default value
- - squash: squash all anonymous structs
- - `-`: skip this field
+> FIELD  FIELD_TYPE `FLAG:"FLAG_NAME,LABEL,OTHER_LABEL:OTHER_VALUE"`
+* 标签:
+ - short: flag的简写
+ - desc: 描述
+ - default: 默认值
+ - squash: 匿名结构展开
+ - `-`: 忽略该字段
 
 * 支持匿名struct以及匿名struct的指针
 * 支持long flag和short flag；支持flag的默认值、描述
@@ -168,4 +168,4 @@ import "github.com/mars315/autoflags"
 ```
 # 许可
 
-autoflags is released under MIT License. See [LICENSE](LICENSE)
+autoflags 是根据 MIT 许可证发布的. 参见 [LICENSE](LICENSE)
