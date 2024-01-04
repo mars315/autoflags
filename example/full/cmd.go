@@ -1,10 +1,12 @@
-// `go run cmd.go --a2.f2 "KK"`
+// `go run cmd.go --f2 "KK"`
 // output:
-//
 //	{
 //		"F1": "x86xm",
 //		"F2": "KK",
 //		"F3": 87,
+//		"A4": {
+//		"F4": 99
+//		},
 //		"DBUrl": ":27071",
 //		"LogFile": "stdout",
 //		"Debug": true,
@@ -18,7 +20,6 @@
 //
 // `go run cmd.go -h`
 // output:
-//
 //	Flags:
 //		--a3.f3 int        f3 (default 87)
 //		--age int          age (default 18)
@@ -26,12 +27,15 @@
 //		--dburl string     dburl (default ":27071")
 //		--debug            enable debug model,false to disable; ,please (default true)
 //		--f2 string        f2 (default "ZH")
+//		--f4 int           f4 (default 99)
 //		-h, --help             help for test
 //		--keep duration     (default 1s)
 //		--logfile string   udp|udp:UdpAddr|FilePath|redirect:x (default "stdout")
 //		--name string      name (default "test")
 //		--short string     short (default "s")
 //		--usage string     usage (default "usage")
+//
+
 package main
 
 import (

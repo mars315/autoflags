@@ -26,4 +26,6 @@ type (
 	Float interface {
 		~float32 | ~float64
 	}
+
+	Any = any
 )
