@@ -106,9 +106,9 @@ type (
 		parent []string
 		// read the flag value from viper
 		autoUnMarshalFlag bool
-		// run pre auto marshal flags
+		// executed before `UnmarshalFlags`, can be used to add the data source of `viper`
 		preAutoUnMarshal func(cmd *cobra.Command, args []string)
-		// run pre auto marshal flags with error
+		//  executed before `UnmarshalFlags`, can be used to add the data source of `viper`
 		preAutoUnMarshalE func(cmd *cobra.Command, args []string) error
 		// The tag name that flag reads for field names, default is "flag"
 		tagName string
@@ -321,7 +321,6 @@ func withSquashOption(squash bool) decoderConfigOption {
 	}
 }
 
-// 自定义tag
 func withTagNameOption(tag string) decoderConfigOption {
 	return func(config *mapstructure.DecoderConfig) {
 		config.TagName = tag
@@ -418,8 +417,8 @@ func parseTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 	if !field.IsExported() {
 		return nil
 	}
-	data := getTag(field, cfg)
-	if data == nil {
+	tag := getTag(field, cfg)
+	if tag == nil {
 		return nil
 	}
 
@@ -429,11 +428,11 @@ func parseTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 	// skip `Base` field // ignoreUntaggedFields == true
 	// --name // ignoreUntaggedFields == false && (cfg.Squash == true || ".squash" in tag)
 	// --base.name // ignoreUntaggedFields == false && squash == false
-	if !cfg.squash && !data.squash && isStepInto(field) {
-		cfg.parent = append(cfg.parent, data.origin)
+	if !cfg.squash && !tag.squash && isStepInto(field) {
+		cfg.parent = append(cfg.parent, tag.origin)
 	}
 
-	return data
+	return tag
 }
 
 // getTag .
@@ -476,7 +475,7 @@ func getTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 	if settings[cfg.tagName] == TagLabelSkip {
 		return nil
 	}
-	data := &tagData{
+	tag := &tagData{
 		Name:    settings[cfg.tagName],
 		Short:   settings[TagLabelShort],
 		Desc:    settings[TagLabelDesc],
@@ -484,14 +483,13 @@ func getTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 	}
 
 	// untagged field use field name as the flag name
-	if len(data.Name) == 0 {
-		data.Name = strings.ToLower(field.Name)
+	if len(tag.Name) == 0 {
+		tag.Name = strings.ToLower(field.Name)
 	}
 
 	_, squashLabel := settings[TagLabelSquash]
-	data.squash = squashLabel && isStepInto(field)
-
-	data.origin = data.Name
+	tag.squash = squashLabel && isStepInto(field)
+	tag.origin = tag.Name
 
 	// add prefix
 	// type Base struct {Name string}
@@ -501,11 +499,11 @@ func getTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 	// --base.name // ignoreUntaggedFields == false && squash == false
 	if !cfg.squash {
 		if len(cfg.parent) > 0 {
-			data.Name = strings.Join(cfg.parent, ".") + "." + data.Name
+			tag.Name = strings.Join(cfg.parent, ".") + "." + tag.Name
 		}
 	}
 
-	return data
+	return tag
 }
 
 /////////////////////////////////////////////////////// struct ///////////////////////////////////////////////////////
