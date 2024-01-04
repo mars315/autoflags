@@ -61,22 +61,11 @@ func main() {
 	}
 }
 
-type A1 struct {
-	F1 string `mapstructure:"f1,desc:f1,default:x86xm"`
-}
-
-type A2 struct {
-	F2 string `mapstructure:"f2,desc:f2,default:ZH"`
-}
-
-type A3 struct {
-	F3 int `mapstructure:"f3,desc:f3,default:87"`
-}
-
 type Flag struct {
 	A1 `mapstructure:"c"`
 	A2 `mapstructure:",squash"`
 	*A3
+	A4       A4            `mapstructure:",squash"`
 	DBUrl    string        `mapstructure:"dburl, desc:dburl, default::27071"`
 	LogFile  string        `mapstructure:"logfile, default:stdout, desc:udp|udp:UdpAddr|FilePath|redirect:x"`
 	Debug    bool          `mapstructure:"debug, default:true, desc:enable debug model\\,false to disable; \\,please"` // "\\" before ","
@@ -91,4 +80,20 @@ type Flag struct {
 func (f *Flag) String() string {
 	str, _ := json.MarshalIndent(f, "", "\t")
 	return string(str)
+}
+
+type A1 struct {
+	F1 string `mapstructure:"f1,desc:f1,default:x86xm"`
+}
+
+type A2 struct {
+	F2 string `mapstructure:"f2,desc:f2,default:ZH"`
+}
+
+type A3 struct {
+	F3 int `mapstructure:"f3,desc:f3,default:87"`
+}
+
+type A4 struct {
+	F4 int `mapstructure:"f4,desc:f4,default:99"`
 }

@@ -288,12 +288,13 @@ func defaultFlagConfig(opts ...FlagOption) *FlagConfig {
 	return cfg
 }
 
-func isAnonymousCaredField(field reflect.StructField) bool {
-	return field.Anonymous && (field.Type.Kind() == reflect.Struct || field.Type.Kind() == reflect.Pointer)
+func isStepInto(field reflect.StructField) bool {
+	return field.Type.Kind() == reflect.Struct ||
+		(field.Type.Kind() == reflect.Pointer && field.Type.Elem().Kind() == reflect.Struct)
 }
 
-func revertAnonymousParentPrefix(field reflect.StructField, cfg *FlagConfig) {
-	if len(cfg.parent) == 0 || !field.Anonymous {
+func tryStepOut(field reflect.StructField, cfg *FlagConfig) {
+	if len(cfg.parent) == 0 {
 		return
 	}
 
@@ -346,7 +347,7 @@ func bindFlags(cmd *cobra.Command, v0 any, cfg *FlagConfig) error {
 				return err
 			}
 		case reflect.Pointer:
-			if err := bindStructPtr(cmd, fValue, field, cfg); err != nil {
+			if err := bindPointer(cmd, fValue, field, cfg); err != nil {
 				return err
 			}
 		default:
@@ -389,7 +390,7 @@ func readFlags(v0 any, cfg *FlagConfig) error {
 				return err
 			}
 		case reflect.Pointer:
-			if err := readStructPtr(fValue, field, cfg); err != nil {
+			if err := readPointer(fValue, field, cfg); err != nil {
 				return err
 			}
 		default:
@@ -410,6 +411,10 @@ type tagData struct {
 }
 
 func parseTag(field reflect.StructField, cfg *FlagConfig) *tagData {
+	if !field.IsExported() {
+		return nil
+	}
+
 	data := getTag(field, cfg)
 	if data == nil {
 		return nil
@@ -421,7 +426,7 @@ func parseTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 	// skip `Base` field // ignoreUntaggedFields == true
 	// --name // ignoreUntaggedFields == false && (cfg.Squash == true || ".squash" in tag)
 	// --base.name // ignoreUntaggedFields == false && squash == false
-	if !cfg.squash && !data.squash && isAnonymousCaredField(field) {
+	if !cfg.squash && !data.squash && isStepInto(field) {
 		cfg.parent = append(cfg.parent, data.origin)
 	}
 
@@ -464,24 +469,24 @@ func getTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 		}
 	}
 
+	// skip `-`
+	if settings[cfg.tagName] == TagLabelSkip {
+		return nil
+	}
+
 	data := &tagData{
 		Name:    settings[cfg.tagName],
 		Short:   settings[TagLabelShort],
 		Desc:    settings[TagLabelDesc],
 		Default: settings[TagLabelDefault],
 	}
-	_, data.squash = settings[TagLabelSquash]
-
 	// untagged field use field name as the flag name
 	if len(data.Name) == 0 {
 		data.Name = strings.ToLower(field.Name)
 	}
 
-	// skip
-	if data.Name == TagLabelSkip {
-		return nil
-	}
-
+	_, squashLabel := settings[TagLabelSquash]
+	data.squash = squashLabel && isStepInto(field)
 	data.origin = data.Name
 
 	// add prefix
@@ -500,37 +505,36 @@ func getTag(field reflect.StructField, cfg *FlagConfig) *tagData {
 }
 
 func bindStruct(cmd *cobra.Command, fValue reflect.Value, field reflect.StructField, cfg *FlagConfig) error {
-	defer revertAnonymousParentPrefix(field, cfg)
+	defer tryStepOut(field, cfg)
 	return bindFlags(cmd, fValue.Addr().Interface(), cfg)
 }
 
 func readStruct(fValue reflect.Value, field reflect.StructField, cfg *FlagConfig) error {
-	defer revertAnonymousParentPrefix(field, cfg)
+	defer tryStepOut(field, cfg)
 	return readFlags(fValue.Addr().Interface(), cfg)
 }
 
-func bindStructPtr(cmd *cobra.Command, fValue reflect.Value, field reflect.StructField, cfg *FlagConfig) error {
-	defer revertAnonymousParentPrefix(field, cfg)
+func bindPointer(cmd *cobra.Command, fValue reflect.Value, field reflect.StructField, cfg *FlagConfig) error {
 	if fValue.IsNil() {
 		return fmt.Errorf("nil value of *%s", field.Name)
 	}
-
 	if fValue.Elem().Kind() != reflect.Struct {
 		return fmt.Errorf("unsupported type: %s|%s(%s)", field.Name, fValue.Kind(), fValue.Elem().Kind())
 	}
+
+	defer tryStepOut(field, cfg)
 	return bindFlags(cmd, fValue.Interface(), cfg)
 }
 
-func readStructPtr(fValue reflect.Value, field reflect.StructField, cfg *FlagConfig) error {
-	defer revertAnonymousParentPrefix(field, cfg)
+func readPointer(fValue reflect.Value, field reflect.StructField, cfg *FlagConfig) error {
 	if fValue.IsNil() {
 		return fmt.Errorf("nil value of *%s", field.Name)
 	}
-
 	if fValue.Elem().Kind() != reflect.Struct {
 		return fmt.Errorf("unsupported type: %s|%s(%s)", field.Name, fValue.Kind(), fValue.Elem().Kind())
 	}
 
+	defer tryStepOut(field, cfg)
 	return readFlags(fValue.Interface(), cfg)
 }
 
