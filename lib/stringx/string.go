@@ -13,6 +13,23 @@ import (
 	"github.com/mars315/autoflags/lib/builtin"
 )
 
+// SafeTokens 切分字符串，去掉空格
+func SafeTokens(cmd string, sep string) []string {
+	if cmd = strings.TrimSpace(cmd); len(cmd) == 0 {
+		return nil
+	}
+
+	tokens := strings.Split(cmd, sep)
+	list := tokens[:0]
+	for _, token := range tokens {
+		str := strings.TrimSpace(token)
+		if len(str) > 0 {
+			list = append(list, str)
+		}
+	}
+	return list
+}
+
 func ToBool(s string) bool {
 	if len(s) == 0 {
 		return false
@@ -36,7 +53,11 @@ func Atoi[T builtin.SignedInteger](v string) T {
 
 // AtoSlice string to signed integer slice
 func AtoSlice[T builtin.SignedInteger](s string, sep string) []T {
-	ss := strings.Split(s, sep)
+	ss := SafeTokens(s, sep)
+	if len(ss) == 0 {
+		return nil
+	}
+
 	l := make([]T, 0, len(ss))
 	for _, v := range ss {
 		l = append(l, Atoi[T](v))
