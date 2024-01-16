@@ -13,7 +13,20 @@ import (
 	"github.com/mars315/autoflags/lib/builtin"
 )
 
-// SafeTokens 切分字符串，去掉空格
+// Split Like strings.Split, but remove the spaces from each string.
+func Split(s0, sep string) []string {
+	s := strings.TrimSpace(s0)
+	l := strings.Split(s, sep)
+
+	r := l[:0]
+	for _, str := range l {
+		r = append(r, strings.TrimSpace(str))
+	}
+
+	return r
+}
+
+// SafeTokens split string, remove spaces, and remove empty strings.
 func SafeTokens(cmd string, sep string) []string {
 	if cmd = strings.TrimSpace(cmd); len(cmd) == 0 {
 		return nil
@@ -63,17 +76,4 @@ func AtoSlice[T builtin.SignedInteger](s string, sep string) []T {
 		l = append(l, Atoi[T](v))
 	}
 	return l
-}
-
-// Split Like strings.Split, but remove the spaces from each string.
-func Split(s0, sep string) []string {
-	s := strings.TrimSpace(s0)
-	l := strings.Split(s, sep)
-
-	r := l[:0]
-	for _, str := range l {
-		r = append(r, strings.TrimSpace(str))
-	}
-
-	return r
 }
